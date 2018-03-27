@@ -2,38 +2,51 @@ import requests, pprint
 from bs4 import BeautifulSoup
 
 
+def extract_title(html):
+    raw_title = html.find(attrs={'class': 'originalTitle'}).text
+    return raw_title.replace('(original title)', '').strip()
+
+
+def extract_poster(html):
+    return html.find(attrs={'class': 'poster'}).find('img')['src']
+
+
+def extract_text_with_itemprop(html, itemprop):
+    raw_data = html.findAll(itemprop=itemprop)
+    return [data.text.strip().replace(',', '') for data in raw_data]
+
+
+def extract_actors(html):
+    return extract_text_with_itemprop(html, 'actors')
+
+
+def extract_creators(html):
+    return extract_text_with_itemprop(html, 'creator')
+
+
+def extract_directors(html):
+    return extract_text_with_itemprop(html, 'director')
+
+
+def extract_genres(html):
+    return extract_text_with_itemprop(html, 'genre')
+
+
+def extract_rating(html):
+    return html.find(itemprop='ratingValue').text
+
+
 def collect_data(html, imdb_id='0'):
-    data = {}
-    data['imdb ID'] = imdb_id
-    data['poster'] = html.find(attrs={'class': 'poster'}).find('img')['src']
-    data['title'] = html.find(attrs={'class': 'originalTitle'}).text.replace('(original title)','').strip()
-    data['rating'] = html.find(itemprop='ratingValue').text
-
-    tags = html.findAll("span", {"itemprop": "genre"})
-    genres = []
-    for genre in tags:
-        genres.append(genre.text.strip())
-    data['genre'] = genres
-
-    tags = html.findAll(itemprop="actors")
-    actors = []
-    for actor in tags:
-        actors.append(actor.text.strip().replace(',', ''))
-    data['cast'] = actors
-
-    tags = html.findAll(itemprop="creator")
-    creators = []
-    for creator in tags:
-        creators.append(creator.text.strip().replace(',', ''))
-    data['writers'] = creators
-
-    directors = []
-    tags = html.findAll(itemprop="director")
-    for director in tags:
-        directors.append(director.text.strip().replace(',', ''))
-    data['directors'] = directors
-
-    return data
+    return {
+        'imdb ID': imdb_id,
+        'poster': extract_poster(html),
+        'title': extract_title(html),
+        'rating': extract_rating(html),
+        'genre': extract_genres(html),
+        'cast': extract_actors(html),
+        'creators': extract_creators(html),
+        'directors': extract_directors(html),
+    }
 
 
 def get_html(url):
@@ -43,7 +56,7 @@ def get_html(url):
 
 def get_url(title):
     try:
-        if title[0:1] == 'tt':
+        if title.startswith('tt'):
             html = get_html('http://www.imdb.com/title/{title}/'.format(title=title))
             imdb_id = title
 

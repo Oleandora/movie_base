@@ -1,5 +1,6 @@
 import requests, pprint
 from bs4 import BeautifulSoup
+from database import Movie, session
 
 
 def extract_title(html):
@@ -20,16 +21,12 @@ def extract_actors(html):
     return extract_text_with_itemprop(html, 'actors')
 
 
-def extract_creators(html):
-    return extract_text_with_itemprop(html, 'creator')
-
-
 def extract_directors(html):
     return extract_text_with_itemprop(html, 'director')
 
 
 def extract_genres(html):
-    return extract_text_with_itemprop(html, 'genre')
+    return extract_text_with_itemprop(html, 'genre')[:-1] # last element dublicate data in inappropriate way, so I cut off it
 
 
 def extract_rating(html):
@@ -38,43 +35,114 @@ def extract_rating(html):
 
 def collect_data(html, imdb_id='0'):
     return {
-        'imdb ID': imdb_id,
+        'imdbid': imdb_id,
         'poster': extract_poster(html),
         'title': extract_title(html),
         'rating': extract_rating(html),
         'genre': extract_genres(html),
         'cast': extract_actors(html),
-        'creators': extract_creators(html),
         'directors': extract_directors(html),
+        'comments': '',
     }
 
 
-def get_html(url):
-    response = requests.get(url)
+def get_html(url, title=''):
+    response = requests.get(url, params={'q': title, 'as_sitesearch': 'imdb.com'})
     return BeautifulSoup(response.content, 'html.parser')
 
 
-def get_url(title):
-    try:
-        if title.startswith('tt'):
-            html = get_html('http://www.imdb.com/title/{title}/'.format(title=title))
-            imdb_id = title
+def find_imdb_content(html):
+    cite = html.find('cite')
+    if 'imdb.com/title/tt' in cite.text:
+        html = get_html('http://{0}'.format(cite.text))
+        get_imdb_id = cite.text.replace('/', '').split('title')
+        imdb_id = get_imdb_id[1]
+        return html, imdb_id
+    else:
+        return 'Can\'t find movie title in Google :(', 'Sorry about that.'
 
-        else:
-            html = get_html('https://www.google.com/search?q={title}'.format(title=title))
-            for cite in html.findAll('cite'):
-                if 'imdb.com/title/tt' in cite.text:
-                    html = get_html('http://{0}'.format(cite.text))
-                    get_imdb_id = cite.text.replace('/', '').split('title')
-                    imdb_id = get_imdb_id[1]
-                    break
-            else:
-                return 'Can\'t find movie title in Google :( Sorry about that.'
+
+def get_movie_data(title):
+    try:
+        html = get_html('https://www.google.com/search', title)
+        html, imdb_id = find_imdb_content(html)
         return collect_data(html, imdb_id)
     except Exception as e:
         return 'Error: ', e.args[0]
 
 
+def list_to_str(data: list):
+    data = ', '.join(data)
+    return data
+
+
+def prepare_record(data):
+    data['rating'] = float(data['rating'])
+    data['cast'] = list_to_str(data['cast'])
+    data['directors'] = list_to_str(data['directors'])
+    data['genre'] = list_to_str(data['genre'])
+    record = Movie(**data)
+    return record
+
+
+def save_movie_info(movie):
+    prepared_record = prepare_record(movie)
+    print(prepared_record.info)
+    if input('Do you want to add this movie to database?  ') == 'yes' or 'y':
+        session.add(prepared_record)
+        session.commit()
+        print('Movie was added to database')
+    else:
+        print('Movie wasn\'t added to database')
+
+
+def str_to_list(data: str()):
+    data = list(data.split(', '))
+    return data
+
+
+def search_movie_data(title):
+    movies = session.query(Movie).filter(Movie.title.ilike('%{title}%'.format(title=title))).all()
+    return movies
+
+
+def choose_movie(movie_list):
+    for number, movie in enumerate(movie_list):
+        print(number, movie.title)
+    selected_movie = int(input('Enter movie number to comment'))
+    return movie_list[selected_movie]
+
+
+def add_comment_to_movie(movie, comment):
+    movie.comments = comment
+
+
+def add_comment():
+    title = input('Which movie do you want to comment? ')
+    movie = choose_movie(search_movie_data(title))
+    comment = input('Movie is found. What comment do you want to save? ')
+    add_comment_to_movie(movie, comment)
+    session.commit()
+    print('Comment was added.')
+
+
 if __name__ == '__main__':
-    movie_name = input("Enter imdb ID or title of the movie: ")
-    pprint.pprint(get_url(movie_name))
+    pass
+
+    # movie_name = input("Enter imdb ID or title of the movie: ")
+    # film = get_movie_data(movie_name)
+    # pprint.pprint(film)
+    # input()
+    # m = prepare_record(film)
+    # print(m.info)
+
+    # save_movie_info(film)
+    # title_to_find = input('Enter the title of movie you want to find: ')
+    # founded_movies = search_movie_data(title_to_find)
+    # for movie in founded_movies:
+    #     print(movie)
+
+    # a = prepare_record(film)
+    # print(a)
+    # session.add(a)
+    # session.commit()

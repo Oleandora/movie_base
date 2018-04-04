@@ -88,7 +88,8 @@ def prepare_record(data):
 def save_movie_info(movie):
     prepared_record = prepare_record(movie)
     print(prepared_record.info)
-    if input('Do you want to add this movie to database?  ') == 'yes' or 'y':
+    user_input = input('Do you want to add this movie to database?  ')
+    if user_input in ['yes', 'y']:
         session.add(prepared_record)
         session.commit()
         print('Movie was added to database')
@@ -129,20 +130,3 @@ def add_comment():
 if __name__ == '__main__':
     pass
 
-    # movie_name = input("Enter imdb ID or title of the movie: ")
-    # film = get_movie_data(movie_name)
-    # pprint.pprint(film)
-    # input()
-    # m = prepare_record(film)
-    # print(m.info)
-
-    # save_movie_info(film)
-    # title_to_find = input('Enter the title of movie you want to find: ')
-    # founded_movies = search_movie_data(title_to_find)
-    # for movie in founded_movies:
-    #     print(movie)
-
-    # a = prepare_record(film)
-    # print(a)
-    # session.add(a)
-    # session.commit()

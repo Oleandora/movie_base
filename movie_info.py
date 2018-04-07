@@ -66,7 +66,8 @@ def get_movie_data(title):
     try:
         html = get_html('https://www.google.com/search', title)
         html, imdb_id = find_imdb_content(html)
-        return collect_data(html, imdb_id)
+        movie = collect_data(html, imdb_id)
+        return prepare_record(movie)
     except Exception as e:
         return 'Error: ', e.args[0]
 

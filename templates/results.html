@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Results of search</title>
+  </head>
+  <body>
+    <div class="page-header">
+        <h1 class="text-center">Results of search</h1>
+    </div>
+
+  <div class="col-xs-12 col-md-8">.col-xs-12 .col-md-8</div>
+  <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
+    <div class="row">
+        <p> Title: {{ movie_data.title }} </p>
+        <p> Imdb ID: {{ movie_data.imdbid }} </p>
+        <p> Genre: {{ movie_data.genre }} </p>
+        <p> Actors: {{ movie_data.cast }} </p>
+        <p> Director: {{ movie_data.directors }} </p>
+        <img src="{{ movie_data.poster }}">
+    </div>
+    <a href="/">
+        <button type="button" class="btn btn-default">Return to main page</button>
+    </a>
+  </body>

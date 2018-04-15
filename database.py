@@ -33,15 +33,24 @@ class Movie(Base):
 
     def __repr__(self):
         return 'Movie(title="{title}", imdbid="{imdbid}", poster="{poster}", rating={rating}, genre="{genre}",' \
-               'cast="{cast}", directors="{directors}", comments="{comments}" '.format(**vars(self))
+               'cast="{cast}", directors="{directors}", comments="{comments}")'.format(**vars(self))
 
     @property
     def info(self):
         return 'Movie title: {title}, imdb ID: {imdbid}, poster: {poster}, rating:{rating}, genre: {genre}, ' \
                'cast: {cast}, directors: {directors}, comments: {comments}'.format(**vars(self))
 
+    @property
+    def return_dict(self):
+        return {"title": self.title,
+                "imdbid": self.imdbid,
+                "poster": self.poster,
+                "rating": self.rating,
+                "genre": self.genre,
+                "cast": self.cast,
+                "directors": self.directors,
+                "comments": self.comments
+                }
+
 
 Base.metadata.create_all(engine)
-
-if __name__ == '__main__':
-    pass

@@ -1,4 +1,4 @@
-import requests, pprint
+import requests, ast
 from bs4 import BeautifulSoup
 from database import Movie, session
 
@@ -73,8 +73,11 @@ def get_movie_data(title):
 
 
 def list_to_str(data: list):
-    data = ', '.join(data)
-    return data
+    if isinstance(data, str):
+        return data
+    else:
+        data = ', '.join(data)
+        return data
 
 
 def prepare_record(data):
@@ -87,15 +90,13 @@ def prepare_record(data):
 
 
 def save_movie_info(movie):
-    prepared_record = prepare_record(movie)
-    print(prepared_record.info)
-    user_input = input('Do you want to add this movie to database?  ')
-    if user_input in ['yes', 'y']:
-        session.add(prepared_record)
-        session.commit()
-        print('Movie was added to database')
-    else:
-        print('Movie wasn\'t added to database')
+    movie = prepare_record(ast.literal_eval(movie))
+    session.add(movie)
+    session.commit()
+
+
+def saved_movies():
+    return session.query(Movie).all()
 
 
 def str_to_list(data: str()):
@@ -104,7 +105,7 @@ def str_to_list(data: str()):
 
 
 def search_movie_data(title):
-    movies = session.query(Movie).filter(Movie.title.ilike('%{title}%'.format(title=title))).all()
+    movies = session.query(Movie).filter(Movie.title.ilike('%{title}%'.format(title=title))).one()
     return movies
 
 
@@ -119,15 +120,10 @@ def add_comment_to_movie(movie, comment):
     movie.comments = comment
 
 
-def add_comment():
-    title = input('Which movie do you want to comment? ')
-    movie = choose_movie(search_movie_data(title))
-    comment = input('Movie is found. What comment do you want to save? ')
+def add_comment(title, comment):
+    movie = search_movie_data(title)
     add_comment_to_movie(movie, comment)
     session.commit()
-    print('Comment was added.')
 
 
-if __name__ == '__main__':
-    pass
 

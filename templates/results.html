@@ -11,21 +11,24 @@
     <title>Results of search</title>
   </head>
   <body>
-    <div class="page-header">
-        <h1 class="text-center">Results of search</h1>
-    </div>
+    <div class="container">
+        <div class="page-header">
+            <h1 class="text-center">Results of search</h1>
+        </div>
 
-  <div class="col-xs-12 col-md-8">.col-xs-12 .col-md-8</div>
-  <div class="col-xs-6 col-md-4">.col-xs-6 .col-md-4</div>
-    <div class="row">
-        <p> Title: {{ movie_data.title }} </p>
-        <p> Imdb ID: {{ movie_data.imdbid }} </p>
-        <p> Genre: {{ movie_data.genre }} </p>
-        <p> Actors: {{ movie_data.cast }} </p>
-        <p> Director: {{ movie_data.directors }} </p>
-        <img src="{{ movie_data.poster }}">
-    </div>
-    <a href="/">
-        <button type="button" class="btn btn-default">Return to main page</button>
-    </a>
+    <p> Title: {{ movie_data.title }} </p>
+    <p> Imdb ID: {{ movie_data.imdbid }} </p>
+    <p> Genre: {{ movie_data.genre }} </p>
+    <p> Actors: {{ movie_data.cast }} </p>
+    <p> Director: {{ movie_data.directors }} </p>
+    <img src="{{ movie_data.poster }}">
+
+    <p>
+        <a href="/">
+            <button type="button" class="btn btn-default">Return to main page</button>
+        </a>
+    </p>
+    <form method="post" action="/save_to_db">
+        <button type="submit" class="btn btn-default" value="{{ movie_data.return_dict }}" name="data">Save movie info</button>
+    </form>
   </body>

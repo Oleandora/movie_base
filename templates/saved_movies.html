@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Saving movie</title>
+</head>
+<body>
+<div class="container">
+    <p>
+    <h2> List of saved movies </h2>
+        <a href="/">
+            <button type="button" class="btn btn-default">Return to main page</button>
+        </a>
+    </p>
+
+    <table cellspacing="5" cellpadding="10">
+     <thead>
+        <tr>
+            <th>POSTER</th>
+            <th>TITLE</th>
+            <th>RATING</th>
+            <th>GENRE</th>
+            <th>CAST</th>
+            <th>DIRECTORS</th>
+            <th>IMDB ID</th>
+            <th>COMMENTS</th>
+        </tr>
+     </thead>
+
+     <tbody>
+        {% for movie in movies %}
+           <tr>
+               <td><img src="{{ movie.poster }}"></td>
+               <td>{{ movie.title }}</td>
+               <td>{{ movie.rating }}</td>
+               <td>{{ movie.genre }}</td>
+               <td>{{ movie.cast }}</td>
+               <td>{{ movie.directors }}</td>
+               <td>{{ movie.imdbid }}</td>
+               <td> <form method="post" action="/comment_added">
+                   <input type="text" name="comment" value="{{ movie.comments }}">
+                   <button type="submit" name="movie" value="{{ movie.title }}">Comment</button> </form>
+               </td>
+           </tr>
+        {% endfor %}
+     </tbody>
+    </table>
+
+
+</div>
+</body>

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from movie_info import get_movie_data, save_movie_info, saved_movies, add_comment
-from database import Movie
+
 
 app = Flask(__name__)
 
@@ -14,7 +14,10 @@ def index():
 def results():
     movie_to_search = request.form.get('movie_to_search')
     movie_data = get_movie_data(movie_to_search)
-    return render_template('results.html', movie_data=movie_data )
+    if movie_data is None:
+        return render_template('movie_not_found.html')
+    else:
+        return render_template('results.html', movie_data=movie_data )
 
 
 @app.route('/save_to_db', methods=['POST'])

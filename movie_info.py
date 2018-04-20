@@ -1,5 +1,7 @@
 from parsing import *
 from database import Movie, session
+import requests, ast
+from bs4 import BeautifulSoup
 
 
 def collect_data(html, imdb_id='0'):
@@ -17,23 +19,25 @@ def collect_data(html, imdb_id='0'):
 
 def find_imdb_content(html):
     cite = html.find('cite')
+    if cite is None:
+        return None, None
     if 'imdb.com/title/tt' in cite.text:
-        html = get_html('http://{0}'.format(cite.text))
+        html = get_html('https://{0}'.format(cite.text))
         get_imdb_id = cite.text.replace('/', '').split('title')
         imdb_id = get_imdb_id[1]
         return html, imdb_id
-    else:
-        return 'Can\'t find movie title in Google :(', 'Sorry about that.'
+    # else:
+    #     return None, None
 
 
 def get_movie_data(title):
-    try:
-        html = get_html('https://www.google.com/search', title)
-        html, imdb_id = find_imdb_content(html)
+    html = get_html('https://www.google.com/search', title)
+    html, imdb_id = find_imdb_content(html)
+    if (html is None) or (imdb_id is None):
+        return None
+    else:
         movie = collect_data(html, imdb_id)
         return prepare_record(movie)
-    except Exception as e:
-        return 'Error: ', e.args[0]
 
 
 def str_to_list(data: str()):
@@ -83,4 +87,7 @@ def add_comment(title, comment):
     session.commit()
 
 
-
+if __name__ == '__main__':
+    title = input('input  ')
+    data = get_movie_data(title)
+    print(data)

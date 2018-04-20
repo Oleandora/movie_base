@@ -109,13 +109,6 @@ def search_movie_data(title):
     return movies
 
 
-def choose_movie(movie_list):
-    for number, movie in enumerate(movie_list):
-        print(number, movie.title)
-    selected_movie = int(input('Enter movie number to comment'))
-    return movie_list[selected_movie]
-
-
 def add_comment_to_movie(movie, comment):
     movie.comments = comment
 

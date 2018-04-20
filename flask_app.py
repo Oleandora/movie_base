@@ -24,10 +24,10 @@ def save_to_db():
     return render_template('save_to_db.html')
 
 
-@app.route('/saved_movies')
+@app.route('/show_all_saved_movies')
 def show_all():
     movies = saved_movies()
-    return render_template('saved_movies.html', movies=movies)
+    return render_template('show_all_saved_movies.html', movies=movies)
 
 
 @app.route('/comment_added', methods=['POST'])
@@ -36,7 +36,7 @@ def add():
     title = request.form['movie']
     add_comment(title, comment_to_add)
     movies = saved_movies()
-    return render_template('saved_movies.html', movies=movies)
+    return render_template('show_all_saved_movies.html', movies=movies)
 
 
 if __name__ == '__main__':
